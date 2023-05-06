@@ -1,51 +1,39 @@
 package org.example;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.google.gson.Gson;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import java.io.IOException;
+import okhttp3.HttpUrl;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ScholarModel {
-    private static final String API_URL = "https://scholar.google.com/citations?user=";
+    private final String API_KEY = "7e29144377a9ed113fbb4ed8dd2e5b20579682c5d0e33fd374e5be9c16e6681b";
+    private final OkHttpClient client = new OkHttpClient();
 
-    private Connection connection;
+    private Connection conn;
 
-    public ScholarModel(Connection connection) {
-        this.connection = connection;
+    public ScholarModel(Connection conn) {
+        this.conn = conn;
     }
 
     public String getAuthorData(String authorId) throws IOException {
-        String url = API_URL + authorId;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.semanticscholar.org/v1/author/" + authorId).newBuilder();
+        urlBuilder.addQueryParameter("apiKey", API_KEY);
+        String url = urlBuilder.build().toString();
 
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(url);
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
-        HttpResponse response = client.execute(request);
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent())
-        );
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-        String line;
-        StringBuilder result = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            result.append(line);
+            return response.body().string();
         }
-
-        try (PreparedStatement statement = connection.prepareStatement("INSERT INTO scholar_data (author_id, data) VALUES (?, ?)")) {
-            statement.setString(1, authorId);
-            statement.setString(2, result.toString());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-        }
-
-        return result.toString();
     }
 }
+

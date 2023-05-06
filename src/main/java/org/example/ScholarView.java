@@ -1,21 +1,22 @@
 package org.example;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Scanner;
+import java.io.InputStreamReader;
 
 public class ScholarView {
+    public String getAuthorIdFromUser() throws IOException {
+        System.out.print("Enter author ID: ");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String authorId = reader.readLine();
+        return authorId;
+    }
+
     public void displayAuthorData(String authorData) {
         System.out.println(authorData);
     }
 
-    public String getAuthorIdFromUser() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter author ID: ");
-        String authorId = scanner.nextLine();
-        return authorId;
-    }
-
     public void displayError(String errorMessage) {
-        System.err.println(errorMessage);
+        System.out.println(errorMessage);
     }
 }
