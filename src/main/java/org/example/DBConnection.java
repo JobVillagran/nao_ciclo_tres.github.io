@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DBConnection {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/nao?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
     private static final String DB_USERNAME = "root";
-    private static final String DB_PASSWORD = "Terminal123";
+    private static final String DB_PASSWORD = "DB PASSWORD SHOULD BE HERE";
 
     public static Connection getConnection() throws SQLException {
         Connection conn = null;
